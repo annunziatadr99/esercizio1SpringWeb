@@ -2,6 +2,11 @@ package com.demo.esercizio1SpringWeb.services;
 
 import com.demo.esercizio1SpringWeb.entities.Author;
 import com.demo.esercizio1SpringWeb.exception.NotFoundException;
+import com.demo.esercizio1SpringWeb.repository.AuthorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -9,57 +14,35 @@ import java.util.*;
 @Service
 public class AuthorService {
 
-    private final List<Author> authors = new ArrayList<>();
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    public Page<Author> getAuthors(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return authorRepository.findAll(pageable);
+    }
 
     public Author save(Author author) {
-        Random rndm = new Random();
-        author.setId(rndm.nextInt());
-        author.setAvatar("https://ui-avatars.com/api/?name="+ author.getName() + "+" + author.getSurname());
-        this.authors.add(author);
-        return author;
+        author.setAvatar("https://ui-avatars.com/api/?name=" + author.getName() + "+" + author.getSurname());
+        return authorRepository.save(author);
     }
 
     public List<Author> getAuthors() {
-        return this.authors;
+        return authorRepository.findAll();
     }
 
     public Author findById(int id) {
-        Author found = null;
-
-        for (Author author : authors) {
-            if (author.getId() == id)
-                found = author;
-        }
-        if (found == null)
-            throw new NotFoundException(id);
-        return found;
+        return authorRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
     }
 
     public void findByIdAndDelete(int id) {
-        ListIterator<Author> iterator = this.authors.listIterator();
-
-        while (iterator.hasNext()) {
-            Author currentAuthor = iterator.next();
-            if (currentAuthor.getId() == id) {
-                iterator.remove();
-            }
-        }
+        authorRepository.deleteById(id);
     }
 
     public Author findByIdAndUpdate(int id, Author author) {
-        Author found = null;
-
-        for (Author currentAuthor : authors) {
-            if (currentAuthor.getId() == id) {
-                found = currentAuthor;
-                found.setName(author.getName());
-                found.setSurname(author.getSurname());
-                found.setId(id);
-            }
-        }
-        if (found == null)
-            throw new NotFoundException(id);
-        return found;
-
+        Author found = authorRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
+        found.setName(author.getName());
+        found.setSurname(author.getSurname());
+        return authorRepository.save(found);
     }
 }

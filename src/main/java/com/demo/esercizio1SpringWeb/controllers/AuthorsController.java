@@ -3,17 +3,10 @@ package com.demo.esercizio1SpringWeb.controllers;
 
 import com.demo.esercizio1SpringWeb.entities.Author;
 import com.demo.esercizio1SpringWeb.services.AuthorService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 
@@ -22,6 +15,12 @@ import java.util.List;
 public class AuthorsController {
     @Autowired
     AuthorService authorsService;
+
+    @GetMapping("")
+    public Page<Author> getAuthors(@RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size) {
+        return authorsService.getAuthors(page, size);
+    }
 
     // 1. - POST http://localhost:3001/authors (+ req.body)
     @PostMapping("")

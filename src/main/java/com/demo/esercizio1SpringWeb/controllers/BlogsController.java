@@ -3,6 +3,7 @@ package com.demo.esercizio1SpringWeb.controllers;
 import com.demo.esercizio1SpringWeb.entities.Blogpost;
 import com.demo.esercizio1SpringWeb.services.BlogsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,12 @@ import java.util.List;
 public class BlogsController {
     @Autowired
     BlogsService blogsService;
+
+    @GetMapping("")
+    public Page<Blogpost> getBlogs(@RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size) {
+        return blogsService.getBlogs(page, size);
+    }
 
     // 1. - POST http://localhost:3001/blogs (+ req.body)
     @PostMapping("")
